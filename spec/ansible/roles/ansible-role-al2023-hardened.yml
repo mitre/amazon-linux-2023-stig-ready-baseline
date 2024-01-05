@@ -1,0 +1,25 @@
+---
+- hosts:
+    - localhost
+  roles:
+    - roles/ansible-role-rhel-vanilla
+    - roles/rhel8STIG
+  serial: 50
+  become: yes
+  vars:
+    rhel8stig_bootloader_password_hash: "changethispassword"
+    rhel_08_040123: false
+    rhel_08_040124: false
+    rhel_08_040125: false
+    rhel_08_010380: false
+  tasks:
+  - name: Call the handler to reload audit rules
+    debug:
+      msg: 'reload audit rules'
+    changed_when: true
+    notify: reload audit rules  # Notify the handler
+
+  handlers:
+    - name: reload audit rules
+      become: yes
+      shell: "augenrules --load"

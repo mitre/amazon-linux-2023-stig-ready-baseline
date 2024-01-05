@@ -1,8 +1,0 @@
----
-- hosts:
-    - localhost
-  roles:
-    - roles/ansible-role-rhel-vanilla
-  serial: 50
-  #vars:
-  #  - deployment_task: configure_apps.yml

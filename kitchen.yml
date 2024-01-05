@@ -1,24 +1,52 @@
----
+transport:
+  name: ssh
+  max_ssh_sessions: 2
+
 verifier:
   name: inspec
   sudo: true
   reporter:
     - cli
     - json:spec/results/%{platform}_%{suite}.json
-  inspec_tests:
-    - name: Red Hat 8 STIG
-      path: .
   input_files:
-    - kitchen.inputs.yml
+    - ec2.inputs.yml
+  inspec_tests:
+    - name: Amazon Linux 2 STIG
+      path: .
+  <% if ENV['INSPEC_CONTROL'] %>
+  controls:
+    - "<%= ENV['INSPEC_CONTROL'] %>"
+  <% end %>
   load_plugins: true
 
+provisioner:
+  name: ansible_playbook
+  hosts: all
+  require_chef_for_busser: false
+  require_ruby_for_busser: false
+  require_pip3: true
+  ansible_binary_path: /usr/local/bin
+  ansible_verbose: true
+  roles_path: spec/ansible/roles
+  galaxy_ignore_certs: true
+  ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
+  requirements_path: spec/ansible/roles/requirements.yml
+  env_vars:
+    - ANSIBLE_LOCAL_TEMP=$HOME/.ansible/tmp
+    - ANSIBLE_REMOTE_TEMP=$HOME/.ansible/tmp
+
 platforms:
-  - name: rhel-8
+  - name: amazon2023
 
 suites:
   - name: vanilla
     provisioner:
-      playbook: spec/ansible/roles/ansible-role-rhel-vanilla.yml
+      playbook: spec/ansible/roles/ansible-role-al2023-vanilla.yml
+    verifier:
+      sudo_password: <%= ENV['SUDO_PASSWD'] || 'P@ssw0rd!' %>
+
   - name: hardened
     provisioner:
-      playbook: spec/ansible/roles/ansible-role-rhel-hardened.yml
+      playbook: spec/ansible/roles/ansible-role-al2023-hardened.yml
+    verifier:
+      sudo_password: <%= ENV['SUDO_PASSWD'] || 'P@ssw0rd!' %>

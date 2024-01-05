@@ -1,0 +1,7 @@
+---
+- hosts:
+    - localhost
+  roles:
+    - roles/ansible-role-al2023-vanilla
+  serial: 50
+  become: yes

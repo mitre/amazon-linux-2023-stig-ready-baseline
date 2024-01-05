@@ -1,0 +1,35 @@
+control 'AMZL-23-230366' do
+  title 'Amazon Linux 2023 user account passwords must have a 60-day maximum password
+lifetime restriction.'
+  desc 'Any password, no matter how complex, can eventually be cracked.
+Therefore, passwords need to be changed periodically. If Amazon Linux 2023 does not limit
+the lifetime of passwords and force users to change their passwords, there is
+the risk that Amazon Linux 2023 passwords could be compromised.'
+  desc 'check', 'Verify that Amazon Linux 2023 enforces a 60-day maximum password lifetime for new user
+accounts by running the following command:
+
+    $ sudo grep -i pass_max_days /etc/login.defs
+    PASS_MAX_DAYS 60
+
+    If the "PASS_MAX_DAYS" parameter value is greater than "60", or
+commented out, this is a finding.'
+  desc 'fix', 'Configure Amazon Linux 2023 to enforce a 60-day maximum password lifetime.
+
+Add, or modify the following line in the "/etc/login.defs" file:
+
+PASS_MAX_DAYS 60'
+  impact 0.5
+  tag severity: 'medium'
+  tag gtitle: 'SRG-OS-000076-GPOS-00044'
+  tag gid: 'AMZL-23-230366'
+  tag rid: 'AMZL-23-230366r646878_rule'
+  tag stig_id: 'AMZL-23-020200'
+  tag fix_id: 'F-33010r567845_fix'
+  tag cci: ['CCI-000199']
+  tag nist: ['IA-5 (1) (d)']
+
+  describe login_defs do
+    its('PASS_MAX_DAYS.to_i') { should cmp <= 60 }
+    its('PASS_MAX_DAYS.to_i') { should cmp > 0 }
+  end
+end
