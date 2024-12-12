@@ -15,10 +15,10 @@ jobs:
       CHEF_LICENSE_KEY: ${{ secrets.SAF_CHEF_LICENSE_KEY }}
       KITCHEN_LOCAL_YAML: kitchen.ec2.yml
       PLATFORM: 'rhel-8'
-      LC_ALL: "en_US.UTF-8"
+      LC_ALL: 'en_US.UTF-8'
     strategy:
       matrix:
-        suite: ["vanilla", "hardened"]
+        suite: ['vanilla', 'hardened']
       fail-fast: false
     steps:
       - name: add needed packages
@@ -33,7 +33,6 @@ jobs:
 
       - name: Check out repository
         uses: actions/checkout@v4
-
       - name: Clone full repository so we can push
         run: git fetch --prune --unshallow
 
@@ -53,7 +52,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.1"
+          ruby-version: '3.1'
 
       - name: Disable ri and rdoc
         run: 'echo "gem: --no-ri --no-rdoc" >> ~/.gemrc'
@@ -77,11 +76,10 @@ jobs:
         if: ${{ !contains(steps.commit.outputs.message, 'only-validate-profile') }}
         uses: mitre/saf_action@v1.5.0
         with:
-          command_string: "view summary -j -i spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}.json -o spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}-data.json"
+          command_string: 'view summary -j -i spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}.json -o spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}-data.json'
 
       - name: Save Test Result JSON
-        if: ${{ !contains(steps.commit.outputs.message, 'only-validate-profile') }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ github.workflow }}-${{ env.COMMIT_SHORT_SHA }}-results
           path: spec/results/
@@ -96,7 +94,7 @@ jobs:
         if: ${{ !contains(steps.commit.outputs.message, 'only-validate-profile') }}
         uses: mitre/saf_action@v1.5.0
         with:
-          command_string: "view summary -i spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}.json"
+          command_string: 'view summary -i spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}.json'
 
       - name: Generate Markdown Summary
         continue-on-error: true
@@ -109,4 +107,4 @@ jobs:
         if: ${{ !contains(steps.commit.outputs.message, 'only-validate-profile') }}
         uses: mitre/saf_action@v1.5.0
         with:
-          command_string: "validate threshold -i spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}.json -F ${{ matrix.suite }}.threshold.yml"
+          command_string: 'validate threshold -i spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}.json -F ${{ matrix.suite }}.threshold.yml'
