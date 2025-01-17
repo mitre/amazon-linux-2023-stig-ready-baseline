@@ -31,7 +31,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.SAF_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.SAF_AWS_REGION }}
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Clone full repository so we can push
         run: git fetch --prune --unshallow
 
@@ -78,6 +78,7 @@ jobs:
           command_string: 'view summary -j -i spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}.json -o spec/results/${{ env.PLATFORM }}_${{ matrix.suite }}-data.json'
 
       - name: Save Test Result JSON
+        if: ${{ !contains(steps.commit.outputs.message, 'only-validate-profile') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.workflow }}-${{ env.COMMIT_SHORT_SHA }}-results
